@@ -1,29 +1,52 @@
 {
-  "name": "thumbnailguru_admin_frontend",
+  "name": "thumbnail",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-  "dev": "vite",
-  "build": "vite build",
-  "lint": "eslint .",
-  "preview": "vite preview --port $PORT --host 0.0.0.0",
-  "start": "vite preview --port $PORT --host 0.0.0.0"
-},
-
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "eslint .",
+    "preview": "vite preview"
+  },
   "dependencies": {
-    "react": "^19.1.1",
-    "react-dom": "^19.1.1"
+    "@blueprintjs/core": "^5.19.0",
+    "@blueprintjs/select": "^5.3.20",
+    "@headlessui/react": "^2.2.2",
+    "@tailwindcss/vite": "^4.1.4",
+    "antd": "^5.24.8",
+    "aos": "^2.3.4",
+    "aws-sdk": "^2.1692.0",
+    "axios": "^1.9.0",
+    "browser-image-compression": "^2.0.2",
+    "date-fns": "^4.1.0",
+    "idb-keyval": "^6.2.2",
+    "install": "^0.13.0",
+    "lodash.debounce": "^4.0.8",
+    "lucide-react": "^0.507.0",
+    "moment": "^2.30.1",
+    "npm": "^11.3.0",
+    "polotno": "^2.22.2",
+    "quill": "^2.0.3",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-icons": "^5.5.0",
+    "react-quill": "^2.0.0",
+    "react-router-dom": "^7.5.2",
+    "react-toastify": "^11.0.5",
+    "sharp": "^0.34.2",
+    "tailwindcss": "^4.1.4",
+    "uuid": "^11.1.0"
   },
   "devDependencies": {
-    "@eslint/js": "^9.33.0",
-    "@types/react": "^19.1.10",
-    "@types/react-dom": "^19.1.7",
-    "@vitejs/plugin-react": "^5.0.0",
-    "eslint": "^9.33.0",
+    "@eslint/js": "^9.22.0",
+    "@types/react": "^18.3.21",
+    "@types/react-dom": "^18.3.7",
+    "@vitejs/plugin-react": "^4.3.4",
+    "eslint": "^9.22.0",
     "eslint-plugin-react-hooks": "^5.2.0",
-    "eslint-plugin-react-refresh": "^0.4.20",
-    "globals": "^16.3.0",
-    "vite": "^7.1.2"
+    "eslint-plugin-react-refresh": "^0.4.19",
+    "globals": "^16.0.0",
+    "vite": "^6.3.1"
   }
 }

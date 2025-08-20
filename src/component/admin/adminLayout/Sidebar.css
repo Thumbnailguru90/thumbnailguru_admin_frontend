@@ -1,0 +1,65 @@
+/* Sidebar.css */
+
+/* Styling for the logo */
+.sidebar-logo {
+  text-align: center;
+  margin: 20px 0;
+}
+
+.sidebar-logo-img {
+  width: 80%; /* Adjust as per your logo size */
+  max-width: 150px; /* Limit width if necessary */
+}
+
+/* Styling for the entire sidebar */
+.ant-menu-inline,
+.ant-menu-vertical {
+  background: #fff; /* Background color for the sidebar */
+}
+
+/* Styling for menu items */
+.ant-menu-item,
+.ant-menu-submenu-title {
+  font-size: 16px; /* Adjust font size */
+}
+
+.ant-menu-item a,
+.ant-menu-submenu-title a {
+  color: #333; /* Link color */
+}
+
+.ant-menu-item-selected,
+.ant-menu-submenu-selected {
+  background-color: #f0f0f0; /* Background color when item is selected */
+}
+
+/* Styling for the Drawer (mobile view) */
+.ant-drawer-header {
+  background: #001529; /* Header background color */
+  color: #fff; /* Header text color */
+}
+
+.ant-drawer-body {
+  padding: 0;
+}
+
+/* Responsive styles for the sidebar toggle button */
+.sidebar-toggle {
+  display: none; /* Hide by default for desktop */
+}
+
+@media (max-width: 768px) {
+  .sidebar-desktop {
+    display: none; /* Hide desktop sidebar on smaller screens */
+  }
+
+  .sidebar-toggle {
+    display: block; /* Show toggle button on smaller screens */
+    /* position: fixed; */
+    /* font-weight: bolder; */
+    /* font-size: larger; */
+    top: 12px;
+    left: 12px;
+    z-index: 1000; /* Ensure it's above other content */
+  }
+}
