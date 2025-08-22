@@ -200,6 +200,15 @@ const Sidebar = () => {
         },
       ],
     },
+      {
+      key: "/admin/deleted/list",
+      icon: <FaShapes />,
+      label: (
+        <Link to="/admin/deleted/list" onClick={onClose}>
+          Deleted Templates
+        </Link>
+      ),
+    },
   ];
 
   return (

@@ -6,6 +6,7 @@ const UploadList = ({ onUploadSuccess }) => {
   const [uploads, setUploads] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
 
   // Pagination states
   const [page, setPage] = useState(1);
@@ -19,7 +20,11 @@ const UploadList = ({ onUploadSuccess }) => {
   const fetchUploads = async (currentPage = 1) => {
     try {
       setLoading(true);
-      const data = await getUploads({ page: currentPage, limit });
+      const data = await getUploads({ 
+        page: currentPage, 
+        limit, 
+        searchTerm: searchTerm.trim() 
+      });
 
       // Backend returns { uploads, total, page, pages }
       setUploads(data.uploads || []);
@@ -42,12 +47,52 @@ const UploadList = ({ onUploadSuccess }) => {
     }
   };
 
+  const handleSearch = (e) => {
+    e.preventDefault();
+    setPage(1); // Reset to first page when searching
+    fetchUploads(1);
+  };
+
+  const handleClearSearch = () => {
+    setSearchTerm("");
+    setPage(1);
+    fetchUploads(1);
+  };
+
   if (loading) return <div className="text-center py-8">Loading...</div>;
   if (error)
     return <div className="text-red-500 text-center py-8">{error}</div>;
 
   return (
     <div>
+      {/* Search Bar */}
+      <div className="p-4 bg-white shadow-md rounded-lg mb-4">
+        <form onSubmit={handleSearch} className="flex gap-2 items-center">
+          <input
+            type="text"
+            placeholder="Search by name..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <button
+            type="submit"
+            className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            Search
+          </button>
+          {searchTerm && (
+            <button
+              type="button"
+              onClick={handleClearSearch}
+              className="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500"
+            >
+              Clear
+            </button>
+          )}
+        </form>
+      </div>
+
       {/* Grid of uploads */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
         {uploads.map((upload) => (
@@ -58,6 +103,13 @@ const UploadList = ({ onUploadSuccess }) => {
           />
         ))}
       </div>
+
+      {/* No results message */}
+      {uploads.length === 0 && !loading && (
+        <div className="text-center py-8 text-gray-500">
+          {searchTerm ? "No uploads found matching your search." : "No uploads found."}
+        </div>
+      )}
 
       {/* Pagination Controls */}
       {pages > 1 && (

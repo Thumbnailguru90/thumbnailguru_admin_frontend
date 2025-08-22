@@ -37,6 +37,16 @@ const deleteTemplate = async (id) => {
   }
 };
 
+const softdeleteTemplate = async (id) => {
+  try {
+    await axios.delete(`${IP}/api/v1/template/soft-delete/${id}`);
+
+    return true;
+  } catch (error) {
+    throw new Error("Failed to delete template");
+  }
+};
+
 const fetchTemplateSuggestions = async (query) => {
   try {
     const res = await axios.get(
@@ -54,4 +64,5 @@ export const templateApiService = {
   deleteTemplate,
   fetchTemplateSuggestions,
   toggleTemplateStatus,
+  softdeleteTemplate
 };

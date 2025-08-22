@@ -7,10 +7,12 @@ import { IP } from "../utils/Constent";
 const API_URL = `${IP}/api/v1/admin-uploads`;
 // const API_URL = "http://localhost:5000/api/v1/admin-uploads";
 // Get all uploads with pagination
-export const getUploads = async ({ page = 1, limit = 9, userId } = {}) => {
+export const getUploads = async ({ page = 1, limit = 9, userId,searchTerm  } = {}) => {
   try {
     const params = { page, limit };
     if (userId) params.userId = userId; // optional filter
+        if (searchTerm) params.searchTerm = searchTerm; // search term
+
 
     const response = await axios.get(API_URL, { params });
     return response.data; // should be { uploads, total, page, pages }

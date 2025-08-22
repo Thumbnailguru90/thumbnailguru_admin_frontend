@@ -22,6 +22,7 @@ import BackgroundUploader from "../../backgroundUpload/BackgroundUploader";
 import BackgroundList from "../../backgroundUpload/BackgroundList";
 import ImageList from "../../imageUpload/ImageList";
 import ProtectedRoute from "../ProtectedRoute";
+import SoftDeletedTemplatesPage from "../../SoftDeletedTemplatesPage/SoftDeletedTemplatesPage";
 
 const AdminRoutes = () => {
   return (
@@ -47,6 +48,7 @@ const AdminRoutes = () => {
           <Route path="images/list" element={<ImageList />} />
           <Route path="background/upload" element={<BackgroundUploader />} />
           <Route path="background/list" element={<BackgroundList />} />
+          <Route path="deleted/list" element={<SoftDeletedTemplatesPage />} />
         </Route>
 
         {/* Editor routes outside Layout */}
