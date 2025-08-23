@@ -9,20 +9,30 @@ export default function CustomFontManager() {
   const [loading, setLoading] = useState(false);
   const [form] = Form.useForm();
   const [file, setFile] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+const [pageSize, setPageSize] = useState(5);
+const [totalItems, setTotalItems] = useState(0);
 
   // ✅ Fetch fonts
-  const fetchFonts = async () => {
-    try {
-      setLoading(true);
-      const res = await axios.get(`${IP}/api/v1/customfont`);
-      
-      setFonts(res.data);
-    } catch (err) {
-      message.error("Failed to fetch fonts");
-    } finally {
-      setLoading(false);
-    }
-  };
+const fetchFonts = async (page = 1, limit = 5) => {
+  try {
+    setLoading(true);
+    const res = await axios.get(`${IP}/api/v1/customfont`, {
+      params: { page, limit },
+    });
+
+    setFonts(res.data.data);
+    setCurrentPage(res.data.currentPage);
+    setPageSize(limit);
+    setTotalItems(res.data.totalItems);
+  } catch (err) {
+    message.error("Failed to fetch fonts");
+  } finally {
+    setLoading(false);
+  }
+};
+
+
 
   useEffect(() => {
     fetchFonts();
@@ -154,13 +164,21 @@ export default function CustomFontManager() {
 
       {/* Fonts List */}
       <Card className="shadow-lg rounded-2xl">
-        <Table
-          rowKey="_id"
-          loading={loading}
-          columns={columns}
-          dataSource={fonts}
-          pagination={{ pageSize: 5 }}
-        />
+       <Table
+  rowKey="_id"
+  loading={loading}
+  columns={columns}
+  dataSource={fonts}
+  pagination={{
+    current: currentPage,
+    pageSize: pageSize,
+    total: totalItems,
+    onChange: (page, pageSize) => {
+      fetchFonts(page, pageSize);
+    },
+  }}
+/>
+
       </Card>
     </div>
   );

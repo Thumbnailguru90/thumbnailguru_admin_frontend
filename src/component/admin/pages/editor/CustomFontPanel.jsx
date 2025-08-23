@@ -3,7 +3,7 @@ import { SectionTab } from "polotno/side-panel";
 import { FaFont, FaSpinner, FaPlus, FaImage } from "react-icons/fa";
 import { IP } from "../../../utils/Constent";
 
-// Debounce hook for search
+// ✅ Debounce hook for search
 const useDebounce = (value, delay) => {
   const [debouncedValue, setDebouncedValue] = useState(value);
 
@@ -39,62 +39,65 @@ const CustomFontPanel = ({ store }) => {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true);
+  const [totalPages, setTotalPages] = useState(1);
 
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
   const observer = useRef();
 
-  // Memoized fetch function
-  const fetchFonts = useCallback(async (pageNum = 1, isSearch = false) => {
-    try {
-      if (pageNum === 1) {
-        setLoading(true);
-      } else {
-        setLoadingMore(true);
+  // ✅ Fetch fonts with pagination + search
+  const fetchFonts = useCallback(
+    async (pageNum = 1, isSearch = false) => {
+      try {
+        if (pageNum === 1) {
+          setLoading(true);
+        } else {
+          setLoadingMore(true);
+        }
+
+        const response = await fetch(
+          `${IP}/api/v1/customfont?page=${pageNum}&limit=10&searchTerm=${encodeURIComponent(
+            debouncedSearchTerm
+          )}`
+        );
+
+        if (!response.ok) throw new Error("Failed to fetch font images");
+
+        const data = await response.json();
+        const fontsData = data.data || [];
+
+        if (pageNum === 1 || isSearch) {
+          setFonts(fontsData);
+        } else {
+          setFonts((prev) => [...prev, ...fontsData]);
+        }
+
+        // ✅ update pagination
+        setPage(data.currentPage || 1);
+        setTotalPages(data.totalPages || 1);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+        setLoadingMore(false);
       }
+    },
+    [debouncedSearchTerm]
+  );
 
-      const response = await fetch(
-        `${IP}/api/v1/customfont?page=${pageNum}&limit=10&search=${encodeURIComponent(
-          debouncedSearchTerm
-        )}`
-      );
-      
-      if (!response.ok) throw new Error("Failed to fetch font images");
-      const data = await response.json();
-
-      // Adjust this based on your actual API response structure
-      const fontsData = data.data || data;
-      
-      if (pageNum === 1 || isSearch) {
-        setFonts(fontsData);
-      } else {
-        setFonts((prev) => [...prev, ...fontsData]);
-      }
-
-      // Check if there are more pages
-      setHasMore(fontsData.length === 10);
-      
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-      setLoadingMore(false);
-    }
-  }, [debouncedSearchTerm]);
-
-  // Effect for search and initial load
+  // ✅ Effect for search and initial load
   useEffect(() => {
     setPage(1);
     fetchFonts(1, true);
   }, [debouncedSearchTerm, fetchFonts]);
 
+  // ✅ Infinite scroll observer
   const lastItemRef = useCallback(
     (node) => {
-      if (loadingMore || !hasMore) return;
+      if (loadingMore || page >= totalPages) return;
       if (observer.current) observer.current.disconnect();
 
       observer.current = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting && hasMore && !loadingMore) {
+        if (entries[0].isIntersecting && page < totalPages && !loadingMore) {
           const nextPage = page + 1;
           setPage(nextPage);
           fetchFonts(nextPage);
@@ -103,13 +106,11 @@ const CustomFontPanel = ({ store }) => {
 
       if (node) observer.current.observe(node);
     },
-    [loadingMore, hasMore, page, fetchFonts]
+    [loadingMore, page, totalPages, fetchFonts]
   );
 
   const handleFontImageClick = (font) => {
     const page = store.activePage;
-    
-    // Create an image element instead of text
     page.addElement({
       type: "image",
       src: font.fontUrl,
@@ -127,8 +128,8 @@ const CustomFontPanel = ({ store }) => {
         method: "DELETE",
       });
       if (!res.ok) throw new Error("Failed to delete font image");
-      
-      // Refresh the first page after deletion
+
+      // Refresh after deletion
       setPage(1);
       fetchFonts(1, true);
     } catch (err) {
@@ -151,8 +152,8 @@ const CustomFontPanel = ({ store }) => {
       });
 
       if (!response.ok) throw new Error("Failed to upload font image");
-      
-      // Refresh the first page after upload
+
+      // Refresh first page
       setPage(1);
       fetchFonts(1, true);
       setIsFormOpen(false);
@@ -210,13 +211,13 @@ const CustomFontPanel = ({ store }) => {
             className="cursor-pointer border rounded-lg p-3 hover:shadow-md transition-shadow"
           >
             <div className="aspect-video bg-gray-100 rounded-md flex items-center justify-center mb-2 overflow-hidden">
-              <img 
-                src={font.fontUrl} 
+              <img
+                src={font.fontUrl}
                 alt={font.name}
                 className="max-h-full max-w-full object-contain"
                 onError={(e) => {
-                  e.target.style.display = 'none';
-                  e.target.nextSibling.style.display = 'flex';
+                  e.target.style.display = "none";
+                  e.target.nextSibling.style.display = "flex";
                 }}
               />
               <div className="text-gray-400 text-sm flex items-center justify-center">
@@ -226,8 +227,8 @@ const CustomFontPanel = ({ store }) => {
             <div className="text-sm font-medium truncate">{font.name}</div>
             {font.tags && font.tags.length > 0 && (
               <div className="text-xs text-gray-500 mt-1 truncate">
-                Tags: {font.tags.slice(0, 3).join(', ')}
-                {font.tags.length > 3 && '...'}
+                Tags: {font.tags.slice(0, 3).join(", ")}
+                {font.tags.length > 3 && "..."}
               </div>
             )}
             <div className="flex justify-between items-center mt-2">
@@ -246,9 +247,7 @@ const CustomFontPanel = ({ store }) => {
       </div>
 
       {fonts.length === 0 && !loading && (
-        <div className="text-center py-8 text-gray-500">
-          No font images found
-        </div>
+        <div className="text-center py-8 text-gray-500">No font images found</div>
       )}
 
       {loadingMore && (
