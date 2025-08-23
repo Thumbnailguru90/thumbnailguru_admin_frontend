@@ -209,6 +209,15 @@ const Sidebar = () => {
         </Link>
       ),
     },
+      {
+      key: "/admin/customfont/list",
+      icon: <FaShapes />,
+      label: (
+        <Link to="/admin/customfont/list" onClick={onClose}>
+          Custom Font List
+        </Link>
+      ),
+    },
   ];
 
   return (

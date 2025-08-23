@@ -280,6 +280,7 @@ import CustomElements from "./ElementsPanel";
 import { UploadSection } from "./UploadSection";
 import { useLocation } from "react-router-dom";
 import { set, get, del, keys } from "idb-keyval";
+import { CustomFontSection } from "./CustomFontPanel";
 // Create store instance
 // const store = createStore({
 //   key: "nFA5H9elEytDyPyvKL7T",
@@ -300,6 +301,7 @@ const sections = [
   CustomElements,
   UploadSection,
   FontsTab,
+  CustomFontSection,
   ...DEFAULT_SECTIONS.filter(
     (section) => section.name !== "templates" && section.name !== "upload"
   ),
