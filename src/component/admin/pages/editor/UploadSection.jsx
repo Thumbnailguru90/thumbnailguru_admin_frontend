@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { SectionTab } from "polotno/side-panel";
 import { FaUpload, FaEllipsisV, FaSpinner } from "react-icons/fa";
@@ -8,7 +7,7 @@ import UploadItem from "../../../uploads/UploadItem";
 import { createUpload } from "../../../uploads/api";
 import { Tabs, Tab } from "@blueprintjs/core";
 
-// Add a debounce function
+// Debounce hook for search
 const useDebounce = (value, delay) => {
   const [debouncedValue, setDebouncedValue] = useState(value);
 
@@ -51,10 +50,9 @@ const UploadPanel = ({ store }) => {
   const [selectedTab, setSelectedTab] = useState("images");
   const [isDragging, setIsDragging] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [refreshKey, setRefreshKey] = useState(0);
 
-  // Use the debounce hook
-  const debouncedSearchTerm = useDebounce(searchTerm, 500); // 500ms delay
-
+  const debouncedSearchTerm = useDebounce(searchTerm, 500);
   const dropRef = useRef(null);
   const observer = useRef();
 
@@ -79,7 +77,7 @@ const UploadPanel = ({ store }) => {
 
   useEffect(() => {
     fetchUploads(1);
-  }, [debouncedSearchTerm]); // Use debounced search term instead
+  }, [debouncedSearchTerm, refreshKey]);
 
   const fetchUploads = async (page = 1) => {
     try {
@@ -88,7 +86,7 @@ const UploadPanel = ({ store }) => {
 
       const response = await fetch(
         `${IP}/api/v1/admin-uploads-categorized?page=${page}&limit=5&search=${encodeURIComponent(
-          debouncedSearchTerm // Use debounced search term
+          debouncedSearchTerm
         )}`
       );
       if (!response.ok) throw new Error("Failed to fetch uploads");
@@ -126,7 +124,6 @@ const UploadPanel = ({ store }) => {
       fetchUploads(activeUploads.pagination.currentPage + 1);
     }
   };
-
 
   const handleUploadClick = async (upload) => {
     if (upload.type === "image") {
@@ -260,9 +257,10 @@ const UploadPanel = ({ store }) => {
     setIsDragging(false);
   };
 
-    if (loading) return <div className="p-4">Loading uploads...</div>;
+  if (loading) return <div className="p-4">Loading uploads...</div>;
   if (error) return <div className="p-4 text-red-600">Error: {error}</div>;
-return (
+
+  return (
     <div
       className="p-2 space-y-4 overflow-auto relative"
       style={{ height: "100%" }}
@@ -281,18 +279,67 @@ return (
         </button>
       </div>
 
-      {/* 🔍 Search bar */}
+      {/* Search bar */}
       <div className="mb-2">
         <input
           type="text"
           placeholder="Search by name..."
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)} // Just update searchTerm, no refreshKey
+          onChange={(e) => setSearchTerm(e.target.value)}
           className="w-full px-3 py-2 border rounded"
         />
       </div>
 
-      {/* drag & drop, upload progress, tabs remain unchanged ... */}
+      {isFormOpen && (
+        <div className="bg-gray-100 p-4 rounded shadow">
+          <input
+            type="file"
+            multiple
+            accept="image/*,video/*,application/pdf"
+            onChange={(e) => {
+              const files = Array.from(e.target.files);
+              if (files.length) {
+                handleMultipleUploads(files);
+                setIsFormOpen(false);
+              }
+            }}
+            className="w-full"
+          />
+        </div>
+      )}
+
+      <div
+        ref={dropRef}
+        className={`border-2 border-dashed rounded-lg p-6 text-center mb-4 transition-colors ${
+          isDragging
+            ? "border-blue-500 bg-blue-50"
+            : "border-gray-300 hover:border-blue-400 hover:bg-blue-50"
+        }`}
+      >
+        <FaUpload className="mx-auto text-gray-400 text-2xl mb-2" />
+        <p className="text-gray-600 mb-1">Drag & drop files here</p>
+        <p className="text-sm text-gray-500">or</p>
+        <button
+          onClick={() => setIsFormOpen(true)}
+          className="mt-2 px-4 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm"
+        >
+          Browse Files
+        </button>
+      </div>
+
+      {Object.entries(uploadProgressMap).map(([filename, percent]) => (
+        <div key={filename} className="mb-2">
+          <div className="text-xs text-gray-700 mb-1">
+            {filename} ({percent}%)
+          </div>
+          <div className="w-full bg-gray-200 rounded h-3">
+            <div
+              className="bg-blue-600 h-3 rounded"
+              style={{ width: `${percent}%` }}
+            ></div>
+          </div>
+        </div>
+      ))}
 
       <Tabs
         selectedTabId={selectedTab}
@@ -355,7 +402,6 @@ return (
       </Tabs>
     </div>
   );
-
 };
 
 export const UploadSection = {
